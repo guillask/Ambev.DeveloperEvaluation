@@ -1,6 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Text.Json;
 
@@ -27,6 +28,15 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
                        .HasConversion(
                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                            v => JsonSerializer.Deserialize<List<ProductsDiscountModel>>(v, (JsonSerializerOptions)null))
-                       .HasColumnType("nvarchar(max)");
+                       .HasColumnType("nvarchar(max)")
+                        .Metadata.SetValueComparer(
+        new ValueComparer<List<ProductsDiscountModel>>(
+            (c1, c2) => JsonSerializer.Serialize(c1, (JsonSerializerOptions)null) == JsonSerializer.Serialize(c2, (JsonSerializerOptions)null),
+            c => JsonSerializer.Serialize(c, (JsonSerializerOptions)null).GetHashCode(),
+            c => JsonSerializer.Deserialize<List<ProductsDiscountModel>>(
+                JsonSerializer.Serialize(c, (JsonSerializerOptions)null),
+                (JsonSerializerOptions)null)
+            )
+        );                       
     }
 }

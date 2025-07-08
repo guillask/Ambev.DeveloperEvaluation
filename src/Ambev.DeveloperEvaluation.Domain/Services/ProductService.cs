@@ -20,8 +20,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Services
         public async Task<Product> AddProduct(ProductDTO productDTO)
         {
             var product = _mapper.Map<Product>(productDTO);
-
-
             return await _repository.Create(product);
         }
 
